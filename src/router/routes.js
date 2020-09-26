@@ -1,30 +1,30 @@
-import Login from "./../views/Login";
-import Profile from "./../views/Profile";
-import EditProfile from "./../views/EditProfile";
+import Login from '../views/Login.vue';
+import Profile from '../views/Profile.vue';
+import EditProfile from '../views/EditProfile.vue';
 
 export default [
   {
-    path: "/",
-    name: "login",
+    path: '/',
+    name: 'login',
     component: Login,
     meta: {
       guard: 'guest',
     },
   },
   {
-    path: "/profile",
-    name: "profile",
+    path: '/profile',
+    name: 'profile',
     component: Profile,
     meta: {
       guard: 'private',
     },
   },
   {
-    path: "/profile/edit",
-    name: "editProfile",
+    path: '/profile/edit',
+    name: 'editProfile',
     component: EditProfile,
     meta: {
       guard: 'private',
     },
   },
-]
+];
