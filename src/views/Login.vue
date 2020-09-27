@@ -1,29 +1,46 @@
 <template>
-  <div class="login__form">
-    <h1>Authorization</h1>
-    <form action="" method="POST" @submit.prevent="login">
-      <input
-        @blur="loginValidation"
-        @input="validationTrue"
-        type="text"
-        placeholder="Login"
-        v-model="user"
+  <div class="login">
+    <h1 class="login__title">Authorization</h1>
+    <form class="login__form" action="" method="POST" @submit.prevent="login">
+      <b-field
+        expanded
+        label="Login:"
+      >
+        <b-input
+          v-model="user"
+          required
+          validation-message="The login field is required"
+          type="text"
+          placeholder="Login"
+        />
+      </b-field>
+      <b-field
+        expanded
+        label="Password:"
+      >
+        <b-input
+          placeholder="Password"
+          type="password"
+          required
+          validation-message="The password field is required"
+          v-model="password"
+        />
+      </b-field>
+      <b-button
+        type="is-light"
+        tag="input"
+        native-type="submit"
+        expanded
+        value="Log In"
       />
-      <div><p v-if="userNotValid">The login field is required</p></div>
-      <input
-        @blur="passwordValidation"
-        @input="validationTrue"
-        type="password"
-        placeholder="Password"
-        v-model="password"
-      />
-      <div><p v-if="passwordNotValid">The password field is required</p></div>
-      <input type="submit" value="Log In" />
+      <p class="login__error" v-if="isError">You are not authenticated</p>
     </form>
   </div>
 </template>
 
 <script>
+import gql from 'graphql-tag';
+import { onLogin } from '../services/apollo-auth';
 
 export default {
   name: 'Login',
@@ -31,58 +48,61 @@ export default {
     return {
       user: '',
       password: '',
-      userNotValid: false,
-      passwordNotValid: false,
+      isError: false,
     };
   },
   methods: {
-    login() {
-      console.log('login');
-    },
-    validationTrue() {
-      this.userNotValid = false;
-      this.passwordNotValid = false;
-    },
-    loginValidation() {
-      if (!this.user.trim()) {
-        this.userNotValid = true;
-      } else {
-        this.userNotValid = false;
-      }
-    },
-    passwordValidation() {
-      if (!this.password.trim()) {
-        this.passwordNotValid = true;
-      } else {
-        this.passwordNotValid = false;
+    async login() {
+      try {
+        const { data } = await this.$apollo.mutate({
+          mutation: gql`
+            mutation Auth($data: AuthInput!) {
+              auth(input: $data)
+            }
+          `,
+          variables: {
+            data: {
+              login: this.user,
+              password: this.password,
+            },
+          },
+        });
+
+        onLogin(this.$apollo.provider.defaultClient, data.auth);
+        this.$router.push({ name: 'profile' });
+      } catch (error) {
+        this.isError = true;
+        console.log(error);
       }
     },
   },
 };
 </script>
 
-<style scoped>
-.login__form {
+<style lang='scss' scoped>
+.login {
   display: flex;
   flex-direction: column;
   height: 60%;
   width: 35%;
-}
-form {
-  width: 100%;
-  height: 100%;
-}
-form input,
-form div {
-  width: 100%;
-  height: 9%;
-  box-sizing: border-box;
-}
-form input[type="submit"] {
-  background: rgb(53, 53, 131);
-  font-size: 20px;
-}
-form p {
-  color: red;
+
+  &__title {
+    margin-bottom: 16px;
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  &__form {
+
+    .field {
+      margin: 24px 0;
+    }
+  }
+
+  &__error {
+    margin-top: 12px;
+    color: red;
+    font-size: 12px;
+  }
 }
 </style>

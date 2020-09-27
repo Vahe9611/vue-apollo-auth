@@ -1,8 +1,22 @@
 <template>
   <div id="app">
-    <router-view/>
+    <component :is="layout">
+      <router-view/>
+    </component>
   </div>
 </template>
+
+<script>
+const DEFAULT_LAYOUT = 'default';
+
+export default {
+  computed: {
+    layout() {
+      return `${this.$route.meta.layout || DEFAULT_LAYOUT}-layout`;
+    },
+  },
+};
+</script>
 
 <style lang="scss">
 body {
@@ -14,8 +28,5 @@ body {
 #app {
   width: 100%;
   height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 </style>

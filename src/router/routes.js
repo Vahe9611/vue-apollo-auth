@@ -17,6 +17,7 @@ export default [
     component: Profile,
     meta: {
       guard: 'private',
+      layout: 'profile',
     },
   },
   {
@@ -25,6 +26,7 @@ export default [
     component: EditProfile,
     meta: {
       guard: 'private',
+      layout: 'profile',
     },
   },
 ];
